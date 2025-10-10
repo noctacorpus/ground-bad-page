@@ -1,52 +1,41 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8" />
-<title>Account Verification</title>
-<style>
-  body {
-    font-family: sans-serif;
-    background: #0d1117;
-    color: #eee;
-    text-align: center;
-    padding-top: 15%;
-  }
-</style>
+  <meta charset="utf-8">
+  <title>GroundBad Verification</title>
+  <style>
+    body { font-family: system-ui; background: #0b1220; color: #e0e8f8; text-align:center; padding-top:10%; }
+    .box { background:#101b2e; display:inline-block; padding:2rem; border-radius:10px; min-width:320px; }
+    h1 { margin-bottom:1rem; }
+  </style>
 </head>
 <body>
-<h3 id="status">Verifying your account...</h3>
+  <div class="box">
+    <h1 id="title">Processing...</h1>
+    <p id="status">Please wait while we confirm your request.</p>
+  </div>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const token = params.get("token");
+    const action = params.get("action") || "verify_account";
 
-<script>
-(async () => {
-  const status = document.getElementById("status");
-  const token = new URLSearchParams(window.location.search).get("token");
-
-  if (!token) {
-    status.textContent = "Missing verification token.";
-    return;
-  }
-
-  try {
-    const res = await fetch("https://cloud-code.services.api.unity.com/v1/projects/3021b893-88f4-4651-916d-924715a5e1b7/modules/CloudManager/confirmEmail", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token })
-    });
-
-    if (res.ok) {
-      const data = await res.json();
-      if (data.success) {
-        status.textContent = "✅ Email verified successfully! You may close this tab and return to the game.";
-      } else {
-        status.textContent = "⚠️ Verification failed: " + data.message;
-      }
+    if (!token) {
+      document.getElementById("title").innerText = "Missing token!";
+      document.getElementById("status").innerText = "No token provided in URL.";
     } else {
-      status.textContent = "❌ Server error. Please try again later.";
+      const cloudUrl = `https://cloud-code.services.api.unity.com/v1/projects/3021b893-88f4-4651-916d-924715a5e1b7/modules/CloudManager/publicVerify?token=${encodeURIComponent(token)}&action=${encodeURIComponent(action)}`;
+      
+      fetch(cloudUrl)
+        .then(r => r.json())
+        .then(data => {
+          document.getElementById("title").innerText = data.success ? "✅ Success" : "❌ Failed";
+          document.getElementById("status").innerText = data.message;
+        })
+        .catch(err => {
+          document.getElementById("title").innerText = "❌ Error";
+          document.getElementById("status").innerText = err.message;
+        });
     }
-  } catch (err) {
-    status.textContent = "❌ Network error: " + err.message;
-  }
-})();
-</script>
+  </script>
 </body>
 </html>
