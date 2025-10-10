@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h3>Verifying your account...</h3>
+<script>
+const token = new URLSearchParams(window.location.search).get("token");
+fetch("https://YOUR_CLOUD_CODE_API/confirmEmail", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ token })
+}).then(() => {
+  document.body.innerHTML = "<h3>Email verified ✅ You can now log in.</h3>";
+});
+</script>
+</body>
+</html>
