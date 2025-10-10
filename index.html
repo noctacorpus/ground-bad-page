@@ -4,7 +4,7 @@
 <h3>Verifying your account...</h3>
 <script>
 const token = new URLSearchParams(window.location.search).get("token");
-fetch($"https://cloud-code.services.api.unity.com/v1/projects/{PROJECT_ID}/modules/CloudManager/confirmEmail", {
+fetch("https://cloud-code.services.api.unity.com/v1/projects/3021b893-88f4-4651-916d-924715a5e1b7/modules/CloudManager/confirmEmail", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({ token })
