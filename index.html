@@ -1,16 +1,52 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Account Verification</title>
+<style>
+  body {
+    font-family: sans-serif;
+    background: #0d1117;
+    color: #eee;
+    text-align: center;
+    padding-top: 15%;
+  }
+</style>
+</head>
 <body>
-<h3>Verifying your account...</h3>
+<h3 id="status">Verifying your account...</h3>
+
 <script>
-const token = new URLSearchParams(window.location.search).get("token");
-fetch("https://cloud-code.services.api.unity.com/v1/projects/3021b893-88f4-4651-916d-924715a5e1b7/modules/CloudManager/confirmEmail", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ token })
-}).then(() => {
-  document.body.innerHTML = "<h3>Email verified. You can now log in.</h3>";
-});
+(async () => {
+  const status = document.getElementById("status");
+  const token = new URLSearchParams(window.location.search).get("token");
+
+  if (!token) {
+    status.textContent = "Missing verification token.";
+    return;
+  }
+
+  try {
+    const res = await fetch("https://cloud-code.services.api.unity.com/v1/projects/3021b893-88f4-4651-916d-924715a5e1b7/modules/CloudManager/confirmEmail", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token })
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data.success) {
+        status.textContent = "✅ Email verified successfully! You may close this tab and return to the game.";
+      } else {
+        status.textContent = "⚠️ Verification failed: " + data.message;
+      }
+    } else {
+      status.textContent = "❌ Server error. Please try again later.";
+    }
+  } catch (err) {
+    status.textContent = "❌ Network error: " + err.message;
+  }
+})();
 </script>
 </body>
 </html>
